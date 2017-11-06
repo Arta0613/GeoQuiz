@@ -10,8 +10,8 @@ import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var trueButton: Button
-    lateinit var falseButton: Button
+    lateinit var trueButton: Button?
+    lateinit var falseButton: Button?
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,11 +20,11 @@ class MainActivity : AppCompatActivity() {
         trueButton = findViewById(R.id.true_button)
         falseButton = findViewById(R.id.false_button)
 
-        trueButton.setOnClickListener({
+        trueButton?.setOnClickListener({
             makeText(R.string.correct_toast)
         })
 
-        falseButton.setOnClickListener({
+        falseButton?.setOnClickListener({
             makeText(R.string.incorrect_toast)
         })
     }
