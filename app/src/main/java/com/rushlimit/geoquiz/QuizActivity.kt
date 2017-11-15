@@ -39,8 +39,11 @@ class QuizActivity : AppCompatActivity() {
         falseButton.setOnClickListener { checkAnswer(false) }
 
         nextButton.setOnClickListener {
-            currentIndex++
-            updateQuestion()
+            nextQuestion()
+        }
+
+        questionTextView.setOnClickListener {
+            nextQuestion()
         }
 
         updateQuestion()
@@ -52,6 +55,11 @@ class QuizActivity : AppCompatActivity() {
         }
 
         questionTextView.setText(questionBank[currentIndex].textResId)
+    }
+
+    private fun nextQuestion() {
+        currentIndex++
+        updateQuestion()
     }
 
     private fun checkAnswer(userAnswer: Boolean){
