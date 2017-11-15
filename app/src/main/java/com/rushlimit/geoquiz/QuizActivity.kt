@@ -7,6 +7,8 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 
+val KEY_INDEX = "index"
+
 class QuizActivity : AppCompatActivity() {
 
     private lateinit var trueButton: Button
@@ -29,6 +31,8 @@ class QuizActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
 
+        currentIndex = savedInstanceState?.getInt(KEY_INDEX) ?: 0
+
         trueButton = findViewById(R.id.true_button)
         falseButton = findViewById(R.id.false_button)
         nextButton = findViewById(R.id.next_button)
@@ -44,6 +48,11 @@ class QuizActivity : AppCompatActivity() {
         }
 
         updateQuestion()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        outState?.putInt(KEY_INDEX, currentIndex)
     }
 
     private fun updateQuestion() {
