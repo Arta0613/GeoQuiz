@@ -31,20 +31,31 @@ class QuizActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
 
-        currentIndex = savedInstanceState?.getInt(KEY_INDEX) ?: 0
-
         trueButton = findViewById(R.id.true_button)
         falseButton = findViewById(R.id.false_button)
         nextButton = findViewById(R.id.next_button)
         questionTextView = findViewById(R.id.question_text_view)
 
-        trueButton.setOnClickListener { checkAnswer(true) }
+        savedInstanceState?.let {
+            currentIndex = it.getInt(KEY_INDEX)
+            toggleButtons(it.getBoolean(KEY_INDEX))
+        }
 
-        falseButton.setOnClickListener { checkAnswer(false) }
+
+        trueButton.setOnClickListener {
+            toggleButtons(false)
+            checkAnswer(true)
+        }
+
+        falseButton.setOnClickListener {
+            toggleButtons(false)
+            checkAnswer(false)
+        }
 
         nextButton.setOnClickListener {
             currentIndex++
             updateQuestion()
+            toggleButtons(true)
         }
 
         updateQuestion()
@@ -53,6 +64,7 @@ class QuizActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
         outState?.putInt(KEY_INDEX, currentIndex)
+        outState?.putBoolean(KEY_INDEX, trueButton.isEnabled)
     }
 
     private fun updateQuestion() {
@@ -69,6 +81,11 @@ class QuizActivity : AppCompatActivity() {
         } else {
             makeText(R.string.incorrect_toast)
         }
+    }
+
+    private fun toggleButtons(enabled: Boolean) {
+        trueButton.isEnabled = enabled
+        falseButton.isEnabled = enabled
     }
 
     private fun Context.makeText(resId: Int, duration: Int = Toast.LENGTH_SHORT) {
