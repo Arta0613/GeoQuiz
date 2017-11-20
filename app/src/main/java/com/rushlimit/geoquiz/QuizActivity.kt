@@ -8,6 +8,7 @@ import android.widget.TextView
 import android.widget.Toast
 
 val KEY_INDEX = "index"
+val KEY_INDEX_TOGGLES = "toggles"
 
 class QuizActivity : AppCompatActivity() {
 
@@ -38,7 +39,7 @@ class QuizActivity : AppCompatActivity() {
 
         savedInstanceState?.let {
             currentIndex = it.getInt(KEY_INDEX)
-            toggleButtons(it.getBoolean(KEY_INDEX))
+            toggleButtons(it.getBoolean(KEY_INDEX_TOGGLES))
         }
 
 
@@ -64,7 +65,7 @@ class QuizActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
         outState?.putInt(KEY_INDEX, currentIndex)
-        outState?.putBoolean(KEY_INDEX, trueButton.isEnabled)
+        outState?.putBoolean(KEY_INDEX_TOGGLES, trueButton.isEnabled)
     }
 
     private fun updateQuestion() {
