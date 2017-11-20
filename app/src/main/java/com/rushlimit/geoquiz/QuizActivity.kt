@@ -9,6 +9,7 @@ import android.widget.Toast
 
 val KEY_INDEX = "index"
 val KEY_INDEX_TOGGLES = "toggles"
+val KEY_INDEX_SCORE = "score"
 
 class QuizActivity : AppCompatActivity() {
 
@@ -27,6 +28,7 @@ class QuizActivity : AppCompatActivity() {
     )
 
     private var currentIndex = 0
+    private var quizScore = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +41,7 @@ class QuizActivity : AppCompatActivity() {
 
         savedInstanceState?.let {
             currentIndex = it.getInt(KEY_INDEX)
+            quizScore = it.getDouble(KEY_INDEX_SCORE)
             toggleButtons(it.getBoolean(KEY_INDEX_TOGGLES))
         }
 
@@ -64,13 +67,17 @@ class QuizActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        outState?.putInt(KEY_INDEX, currentIndex)
-        outState?.putBoolean(KEY_INDEX_TOGGLES, trueButton.isEnabled)
+        outState?.let {
+            it.putInt(KEY_INDEX, currentIndex)
+            it.putDouble(KEY_INDEX_SCORE, quizScore)
+            it.putBoolean(KEY_INDEX_TOGGLES, trueButton.isEnabled)
+        }
     }
 
     private fun updateQuestion() {
         if (currentIndex == questionBank.size) {
             currentIndex = 0
+            quizScore = 0.0
         }
 
         questionTextView.setText(questionBank[currentIndex].textResId)
@@ -79,8 +86,13 @@ class QuizActivity : AppCompatActivity() {
     private fun checkAnswer(userAnswer: Boolean){
         if (userAnswer == questionBank[currentIndex].triviaAnswer) {
             makeText(R.string.correct_toast)
+            quizScore++
         } else {
             makeText(R.string.incorrect_toast)
+        }
+
+        if (currentIndex == questionBank.size - 1) {
+            makeText(getString(R.string.percent_correct, (quizScore / questionBank.size) * 100))
         }
     }
 
@@ -89,7 +101,11 @@ class QuizActivity : AppCompatActivity() {
         falseButton.isEnabled = enabled
     }
 
-    private fun Context.makeText(resId: Int, duration: Int = Toast.LENGTH_SHORT) {
-        Toast.makeText(this, resId, duration).show()
+    private fun makeText(resId: Int, duration: Int = Toast.LENGTH_SHORT) {
+        makeText(getString(resId), duration)
+    }
+
+    private fun Context.makeText(text: String, duration: Int = Toast.LENGTH_SHORT) {
+        Toast.makeText(this, text, duration).show()
     }
 }
