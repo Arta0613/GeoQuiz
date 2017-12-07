@@ -1,20 +1,17 @@
 package com.rushlimit.geoquiz
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_quiz.*
 
 val KEY_INDEX = "index"
+val REQUEST_CODE_CHEAT = 0
 
 class QuizActivity : AppCompatActivity() {
-
-    private lateinit var trueButton: Button
-    private lateinit var falseButton: Button
-    private lateinit var nextButton: Button
-    private lateinit var questionTextView: TextView
 
     private val questionBank = arrayOf(
             Question(R.string.question_australia, true),
@@ -26,6 +23,7 @@ class QuizActivity : AppCompatActivity() {
     )
 
     private var currentIndex = 0
+    private var cheater = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,17 +31,18 @@ class QuizActivity : AppCompatActivity() {
 
         currentIndex = savedInstanceState?.getInt(KEY_INDEX) ?: 0
 
-        trueButton = findViewById(R.id.true_button)
-        falseButton = findViewById(R.id.false_button)
-        nextButton = findViewById(R.id.next_button)
-        questionTextView = findViewById(R.id.question_text_view)
+        true_button.setOnClickListener { checkAnswer(true) }
+        false_button.setOnClickListener { checkAnswer(false) }
 
-        trueButton.setOnClickListener { checkAnswer(true) }
+        cheat_button.setOnClickListener {
+            val intent = Intent(this, CheatActivity::class.java)
+            intent.putExtra(EXTRA_ANSWER, questionBank[currentIndex].triviaAnswer)
+            startActivityForResult(intent, REQUEST_CODE_CHEAT)
+        }
 
-        falseButton.setOnClickListener { checkAnswer(false) }
-
-        nextButton.setOnClickListener {
+        next_button.setOnClickListener {
             currentIndex++
+            cheater = false
             updateQuestion()
         }
 
@@ -60,10 +59,15 @@ class QuizActivity : AppCompatActivity() {
             currentIndex = 0
         }
 
-        questionTextView.setText(questionBank[currentIndex].textResId)
+        question_text_view.setText(questionBank[currentIndex].textResId)
     }
 
-    private fun checkAnswer(userAnswer: Boolean){
+    private fun checkAnswer(userAnswer: Boolean) {
+        if (cheater) {
+            makeText(R.string.judgement_toast)
+            return
+        }
+
         if (userAnswer == questionBank[currentIndex].triviaAnswer) {
             makeText(R.string.correct_toast)
         } else {
@@ -73,5 +77,17 @@ class QuizActivity : AppCompatActivity() {
 
     private fun Context.makeText(resId: Int, duration: Int = Toast.LENGTH_SHORT) {
         Toast.makeText(this, resId, duration).show()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (resultCode != Activity.RESULT_OK) {
+            return
+        }
+
+        data?.let {
+            if (requestCode == REQUEST_CODE_CHEAT) {
+                cheater = data.getBooleanExtra(EXTRA_ANSWER_SHOWN, false)
+            }
+        }
     }
 }
