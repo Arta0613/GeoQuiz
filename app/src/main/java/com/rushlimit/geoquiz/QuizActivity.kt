@@ -9,6 +9,7 @@ import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_quiz.*
 
 val KEY_INDEX = "index"
+val KEY_CHEAT_INDEX = "cheat_index"
 val REQUEST_CODE_CHEAT = 0
 
 class QuizActivity : AppCompatActivity() {
@@ -23,13 +24,14 @@ class QuizActivity : AppCompatActivity() {
     )
 
     private var currentIndex = 0
-    private var cheater = false
+    private var cheatMap: HashMap<Int, Boolean>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
 
         currentIndex = savedInstanceState?.getInt(KEY_INDEX) ?: 0
+        cheatMap = savedInstanceState?.getSerializable(KEY_CHEAT_INDEX) as HashMap<Int, Boolean>? ?: HashMap()
 
         true_button.setOnClickListener { checkAnswer(true) }
         false_button.setOnClickListener { checkAnswer(false) }
@@ -42,7 +44,6 @@ class QuizActivity : AppCompatActivity() {
 
         next_button.setOnClickListener {
             currentIndex++
-            cheater = false
             updateQuestion()
         }
 
@@ -52,6 +53,7 @@ class QuizActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
         outState?.putInt(KEY_INDEX, currentIndex)
+        outState?.putSerializable(KEY_CHEAT_INDEX, cheatMap)
     }
 
     private fun updateQuestion() {
@@ -63,7 +65,7 @@ class QuizActivity : AppCompatActivity() {
     }
 
     private fun checkAnswer(userAnswer: Boolean) {
-        if (cheater) {
+        if (cheatMap?.get(currentIndex) == true) {
             makeText(R.string.judgement_toast)
             return
         }
@@ -86,7 +88,7 @@ class QuizActivity : AppCompatActivity() {
 
         data?.let {
             if (requestCode == REQUEST_CODE_CHEAT) {
-                cheater = data.getBooleanExtra(EXTRA_ANSWER_SHOWN, false)
+                cheatMap?.put(currentIndex, data.getBooleanExtra(EXTRA_ANSWER_SHOWN, false))
             }
         }
     }
