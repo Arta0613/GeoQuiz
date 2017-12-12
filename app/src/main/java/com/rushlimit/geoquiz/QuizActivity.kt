@@ -10,6 +10,7 @@ import kotlinx.android.synthetic.main.activity_quiz.*
 
 val KEY_INDEX = "index"
 val REQUEST_CODE_CHEAT = 0
+val KEY_CHEATS_AVAILABLE = "cheats_available"
 
 class QuizActivity : AppCompatActivity() {
 
@@ -24,13 +25,16 @@ class QuizActivity : AppCompatActivity() {
 
     private var currentIndex = 0
     private var cheater = false
+    private var availableCheats = 3
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_quiz)
 
         currentIndex = savedInstanceState?.getInt(KEY_INDEX) ?: 0
+        availableCheats = savedInstanceState?.getInt(KEY_CHEATS_AVAILABLE) ?: 3
 
+        updateCheatButtonState()
         true_button.setOnClickListener { checkAnswer(true) }
         false_button.setOnClickListener { checkAnswer(false) }
 
@@ -52,6 +56,15 @@ class QuizActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
         outState?.putInt(KEY_INDEX, currentIndex)
+        outState?.putInt(KEY_CHEATS_AVAILABLE, availableCheats)
+    }
+
+    private fun updateCheatButtonState() {
+        if (availableCheats <= 0) {
+            cheat_button.isEnabled = false
+        }
+
+        cheats_available_text_view.text = resources.getString(R.string.cheats_available, availableCheats)
     }
 
     private fun updateQuestion() {
@@ -87,6 +100,8 @@ class QuizActivity : AppCompatActivity() {
         data?.let {
             if (requestCode == REQUEST_CODE_CHEAT) {
                 cheater = data.getBooleanExtra(EXTRA_ANSWER_SHOWN, false)
+                availableCheats--
+                updateCheatButtonState()
             }
         }
     }
