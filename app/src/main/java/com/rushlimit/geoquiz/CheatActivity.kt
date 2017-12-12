@@ -22,6 +22,8 @@ class CheatActivity : AppCompatActivity() {
 
         val triviaAnswer = intent.getBooleanExtra(EXTRA_ANSWER, false)
 
+        api_level_text_view.text = resources.getString(R.string.api_level, Build.VERSION.SDK_INT)
+
         show_answer_button.setOnClickListener {
             setAnswerShown()
 
